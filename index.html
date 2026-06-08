@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a56db">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SamGestor">
+<link rel="manifest" href="manifest.json">
+<title>SamGestor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f5f5;--bg2:#fff;--bg3:#e8f0fe;
+  --txt:#1a1a2e;--txt2:#666;--txt3:#aaa;
+  --brd:#e0e0e0;--brd2:#c8c8c8;
+  --green:#085041;--green-bg:#E1F5EE;
+  --red:#791F1F;--red-bg:#FCEBEB;
+  --info:#1a56db;--info-bg:#e8f0fe;
+  --rad:8px;--radlg:12px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a1a;--bg2:#252525;--bg3:#1e2a3a;
+    --txt:#f0f0f0;--txt2:#aaa;--txt3:#666;
+    --brd:#333;--brd2:#444;
+    --green:#9FE1CB;--green-bg:#04342C;
+    --red:#F09595;--red-bg:#501313;
+    --info:#85B7EB;--info-bg:#042C53;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;-webkit-tap-highlight-color:transparent}
+.pg{display:none;flex-direction:column;min-height:100vh}
+.pg.on{display:flex}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--brd);padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.topbar h1{font-size:17px;font-weight:600;flex:1}
+.btn{border:1px solid var(--brd2);background:var(--bg2);color:var(--txt);border-radius:var(--rad);padding:11px 14px;font-size:14px;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;-webkit-appearance:none}
+.btn:active{opacity:.7}
+.btn-p{background:var(--info-bg);color:var(--info);border-color:var(--info);font-weight:600}
+.btn-d{background:var(--red-bg);color:var(--red);border-color:#f09595}
+.btn-g{background:var(--green-bg);color:var(--green);border-color:#9FE1CB;font-weight:600}
+.btn-ic{padding:8px;width:38px;height:38px;flex-shrink:0}
+.scroll{flex:1;padding:14px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.inp{width:100%;border:1px solid var(--brd2);border-radius:var(--rad);padding:12px;font-size:16px;background:var(--bg2);color:var(--txt);margin-bottom:12px;font-family:inherit;-webkit-appearance:none}
+.inp:focus{outline:none;border-color:var(--info)}
+.lbl{font-size:13px;color:var(--txt2);margin-bottom:5px;display:block;font-weight:500}
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radlg);padding:1rem 1.1rem;margin-bottom:10px}
+.met{background:var(--bg);border-radius:var(--rad);padding:.9rem;text-align:center}
+.met-v{font-size:19px;font-weight:600}
+.met-l{font-size:11px;color:var(--txt2);margin-top:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.tab-bar{display:flex;background:var(--bg2);border-top:1px solid var(--brd);padding:8px 0 max(4px,env(safe-area-inset-bottom))}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;color:var(--txt3);font-size:11px;border:none;background:none;font-family:inherit}
+.tab.on{color:var(--info)}
+.tab i{font-size:22px}
+.mi{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--brd);cursor:pointer}
+.mi:last-child{border-bottom:none}
+.mi-ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.mi-inf{flex:1;min-width:0}
+.mi-n{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi-d{font-size:12px;color:var(--txt2);margin-top:1px}
+.mi-v{font-size:14px;font-weight:600;white-space:nowrap}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.sec{font-size:11px;font-weight:700;color:var(--txt3);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.07em}
+.ci{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radlg);margin-bottom:8px;cursor:pointer}
+.ci:active{background:var(--bg)}
+.ca{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.trow{display:flex;gap:0;border:1px solid var(--brd2);border-radius:var(--rad);overflow:hidden;margin-bottom:14px}
+.tbtn{flex:1;padding:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--bg2);color:var(--txt2);font-family:inherit}
+.tbtn.sp{background:var(--green-bg);color:var(--green)}
+.tbtn.sn{background:var(--red-bg);color:var(--red)}
+.tbtn.sa{background:var(--info-bg);color:var(--info)}
+.bw{margin-bottom:8px}
+.bl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.bt{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;transition:width .4s}
+.sugg{background:var(--bg2);border:1px solid var(--brd2);border-radius:var(--rad);margin-top:-12px;margin-bottom:12px;overflow:hidden;display:none;z-index:20;position:relative}
+.sugg-item{padding:12px;font-size:15px;cursor:pointer;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
+.sugg-item:last-child{border-bottom:none}
+.sugg-item:active{background:var(--bg)}
+.empty{text-align:center;padding:36px 20px;color:var(--txt2);font-size:14px;line-height:1.6}
+.empty i{font-size:40px;display:block;margin-bottom:10px;opacity:.3}
+.err{font-size:13px;color:var(--red);margin-bottom:10px;display:none;padding:8px 12px;background:var(--red-bg);border-radius:var(--rad)}
+.cor-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.cor{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent}
+.hdr-conta{padding:16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--brd);background:var(--bg2)}
+.sel-nat{font-size:13px;padding:5px 10px;border:1px solid var(--brd2);border-radius:var(--rad);background:var(--bg2);color:var(--txt);font-family:inherit}
+.moeda-tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--bg);color:var(--txt2);font-weight:600;display:inline-block}
+.conta-info-mov{display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border-radius:var(--rad);margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div id="pg-login" class="pg on">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px 24px">
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="width:72px;height:72px;background:var(--info-bg);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i class="ti ti-wallet" style="font-size:32px;color:var(--info)"></i>
+      </div>
+      <p style="font-size:24px;font-weight:700">SamGestor</p>
+      <p style="font-size:14px;color:var(--txt2);margin-top:6px">Gestão de contas pessoais</p>
+    </div>
+    <label class="lbl">Email</label>
+    <input class="inp" id="li-email" type="email" placeholder="email@exemplo.com" inputmode="email">
+    <label class="lbl">Password</label>
+    <input class="inp" id="li-pass" type="password" placeholder="••••••••">
+    <div id="li-err" class="err"></div>
+    <button class="btn btn-p" onclick="doLogin()" style="padding:14px">Entrar</button>
+    <div style="text-align:center;margin:16px 0;font-size:14px;color:var(--txt2)">ou</div>
+    <button class="btn" onclick="show('pg-reg')" style="padding:14px">Criar conta nova</button>
+  </div>
+</div>
+
+<div id="pg-reg" class="pg">
+  <div class="topbar">
+    <button class="btn btn-ic" onclick="show('pg-login')"><i class="ti ti-arrow-left"></i></button>
+    <h1>Criar conta</h1>
+  </div>
+  <div class="scroll">
+    <label class="lbl">Nome completo</label>
+    <input class="inp" id="rg-nome" placeholder="O teu nome">
+    <label class="lbl">Email</label>
+    <input class="inp" id="rg-email" type="email" placeholder="email@exemplo.com" inputmode="email">
+    <label class="lbl">Password</label>
+    <input class="inp" id="rg-pass" type="password" placeholder="Mínimo 6 caracteres">
+    <label class="lbl">Confirmar password</label>
+    <input class="inp" id="rg-pass2" type="password" placeholder="Repetir password">
+    <div id="rg-err" class="err"></div>
+    <button class="btn btn-p" onclick="doReg()" style="padding:14px">Criar conta</button>
+  </div>
+</div>
+
+<div id="pg-main" class="pg">
+  <div class="topbar">
+    <h1 id="main-titulo">Início</h1>
+    <button class="btn btn-ic" onclick="doLogout()"><i class="ti ti-logout"></i></button>
+  </div>
+  <div id="tab-inicio" class="scroll">
+    <div id="resumo-contas" style="margin-bottom:14px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span class="sec" style="margin:0">Últimos movimentos</span>
+      <button class="btn" style="width:auto;padding:7px 12px;font-size:13px" onclick="abrirSelConta()">
+        <i class="ti ti-plus"></i> Novo
+      </button>
+    </div>
+    <div id="lista-ult" class="card"></div>
+  </div>
+  <div id="tab-contas" class="scroll" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span class="sec" style="margin:0">Minhas contas</span>
+      <button class="btn" style="width:auto;padding:7px 12px;font-size:13px" onclick="show('pg-nova-conta')">
+        <i class="ti ti-plus"></i> Nova
+      </button>
+    </div>
+    <div id="lista-contas"></div>
+  </div>
+  <div id="tab-rel" class="scroll" style="display:none">
+    <div class="trow" style="margin-bottom:10px">
+      <button class="tbtn sp" id="rb-dia" onclick="setRel('dia')">Hoje</button>
+      <button class="tbtn" id="rb-sem" onclick="setRel('semana')">Semana</button>
+      <button class="tbtn" id="rb-mes" onclick="setRel('mes')">Mês</button>
+      <button class="tbtn" id="rb-ano" onclick="setRel('ano')">Ano</button>
+    </div>
+    <div style="background:var(--bg);border-radius:var(--rad);padding:10px 12px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--txt2);margin-bottom:6px;font-weight:600">Período personalizado</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--txt3);margin-bottom:3px">De</div>
+          <input type="date" id="rel-de" class="inp" style="margin:0;padding:8px;font-size:13px" onchange="setRelPersonalizado()">
+        </div>
+        <div style="color:var(--txt3);font-size:16px;padding-top:14px">—</div>
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--txt3);margin-bottom:3px">Até</div>
+          <input type="date" id="rel-ate" class="inp" style="margin:0;padding:8px;font-size:13px" onchange="setRelPersonalizado()">
+        </div>
+      </div>
+    </div>
+    <div class="trow">
+      <button class="tbtn sa" id="rt-tod" onclick="setRelTipo('todos')">Todos</button>
+      <button class="tbtn" id="rt-pos" onclick="setRelTipo('pos')">Entradas</button>
+      <button class="tbtn" id="rt-neg" onclick="setRelTipo('neg')">Saídas</button>
+    </div>
+    <div id="rel-por-conta" style="margin-bottom:12px"></div>
+    <div class="sec">Movimentos no período</div>
+    <div id="lista-rel" class="card"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-p" style="flex:1" onclick="expPDF()"><i class="ti ti-file-text"></i> PDF</button>
+      <button class="btn btn-g" style="flex:1" onclick="expImagem()"><i class="ti ti-photo"></i> Imagem</button>
+    </div>
+  </div>
+  <nav class="tab-bar">
+    <button class="tab on" id="tb-inicio" onclick="switchTab('inicio')"><i class="ti ti-home"></i>início</button>
+    <button class="tab" id="tb-contas" onclick="switchTab('contas')"><i class="ti ti-wallet"></i>contas</button>
+    <button class="tab" id="tb-rel" onclick="switchTab('rel')"><i class="ti ti-chart-bar"></i>relatórios</button>
+  </nav>
+</div>
+
+<div id="pg-conta" class="pg">
+  <div class="topbar">
+    <button class="btn btn-ic" onclick="voltarParaContas()"><i class="ti ti-arrow-left"></i></button>
+    <h1 id="ct-titulo">Conta</h1>
+    <button class="btn btn-ic" onclick="abrirMov(contaAtual)"><i class="ti ti-plus"></i></button>
+  </div>
+  <div id="ct-header" class="hdr-conta"></div>
+  <div class="scroll" style="padding-top:12px">
+    <div class="g2">
+      <div class="met"><div id="ct-ent" class="met-v pos">0,00</div><div class="met-l">Entradas</div></div>
+      <div class="met"><div id="ct-sai" class="met-v neg">0,00</div><div class="met-l">Saídas</div></div>
+    </div>
+    <div class="sec" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Movimentos</span>
+      <select id="ct-filtro" class="sel-nat" onchange="renderConta()">
+        <option value="todos">Todos</option>
+        <option value="pos">Entradas</option>
+        <option value="neg">Saídas</option>
+      </select>
+    </div>
+    <div id="ct-movs" class="card"></div>
+    <div style="margin-top:16px;border:1px solid #f09595;border-radius:var(--radlg);padding:14px;background:var(--red-bg)">
+      <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:4px"><i class="ti ti-alert-triangle" style="vertical-align:-2px"></i> Zona de perigo</div>
+      <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">Para apagar esta conta escreve o nome exacto para confirmar:</div>
+      <input class="inp" id="confirm-nome-conta" placeholder="Escreve o nome da conta..." style="margin-bottom:8px">
+      <button class="btn btn-d" id="btn-apagar-conta" onclick="confirmarApagarConta()">
+        <i class="ti ti-trash"></i> Apagar conta permanentemente
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="pg-nova-conta" class="pg">
+  <div class="topbar">
+    <button class="btn btn-ic" onclick="show('pg-main');switchTab('contas')"><i class="ti ti-arrow-left"></i></button>
+    <h1>Nova conta</h1>
+  </div>
+  <div class="scroll">
+    <label class="lbl">Nome da conta</label>
+    <input class="inp" id="nc-nome" placeholder="Ex: Conta BM, Poupança, Carteira...">
+    <label class="lbl">Saldo inicial</label>
+    <input class="inp" id="nc-saldo" type="number" placeholder="0.00" min="0" inputmode="decimal">
+    <label class="lbl">Moeda</label>
+    <select class="inp" id="nc-moeda">
+      <option value="MZN">MZN — Metical moçambicano</option>
+      <option value="USD">USD — Dólar americano</option>
+      <option value="EUR">EUR — Euro</option>
+      <option value="ZAR">ZAR — Rand sul-africano</option>
+      <option value="GBP">GBP — Libra esterlina</option>
+      <option value="BRL">BRL — Real brasileiro</option>
+      <option value="AOA">AOA — Kwanza angolano</option>
+      <option value="KES">KES — Shilling queniano</option>
+    </select>
+    <label class="lbl">Cor</label>
+    <div class="cor-row">
+      <div class="cor" data-c="#378ADD" style="background:#378ADD" onclick="selCor(this)"></div>
+      <div class="cor" data-c="#1D9E75" style="background:#1D9E75" onclick="selCor(this)"></div>
+      <div class="cor" data-c="#E24B4A" style="background:#E24B4A" onclick="selCor(this)"></div>
+      <div class="cor" data-c="#BA7517" style="background:#BA7517" onclick="selCor(this)"></div>
+      <div class="cor" data-c="#533AB7" style="background:#533AB7" onclick="selCor(this)"></div>
+      <div class="cor" data-c="#D4537E" style="background:#D4537E" onclick="selCor(this)"></div>
+    </div>
+    <div id="nc-err" class="err"></div>
+    <button class="btn btn-p" onclick="salvarConta()" style="padding:14px">Criar conta</button>
+  </div>
+</div>
+
+<div id="pg-sel-conta" class="pg">
+  <div class="topbar">
+    <button class="btn btn-ic" onclick="show('pg-main')"><i class="ti ti-arrow-left"></i></button>
+    <h1>Escolher conta</h1>
+  </div>
+  <div class="scroll">
+    <p style="font-size:14px;color:var(--txt2);margin-bottom:16px">Para que conta é este movimento?</p>
+    <div id="sel-lista-contas"></div>
+  </div>
+</div>
+
+<div id="pg-mov" class="pg">
+  <div class="topbar">
+    <button class="btn btn-ic" id="mov-back"><i class="ti ti-arrow-left"></i></button>
+    <h1>Novo movimento</h1>
+  </div>
+  <div class="scroll">
+    <div class="conta-info-mov">
+      <div id="mov-ca" class="ca" style="width:36px;height:36px;font-size:13px"></div>
+      <div>
+        <div id="mov-cn" style="font-size:14px;font-weight:600"></div>
+        <div id="mov-cm" style="font-size:12px;color:var(--txt2)"></div>
+      </div>
+    </div>
+    <div class="trow">
+      <button class="tbtn sp" id="tipo-pos" onclick="setTipo('pos')"><i class="ti ti-plus"></i> Entrada</button>
+      <button class="tbtn" id="tipo-neg" onclick="setTipo('neg')"><i class="ti ti-minus"></i> Saída</button>
+    </div>
+    <label class="lbl">Nome / Descrição</label>
+    <input class="inp" id="mov-nome" placeholder="Ex: Ricardo Paulo, Renda..." autocomplete="off" oninput="onNomeInput()" onblur="setTimeout(()=>hideSugg(),200)">
+    <div id="sugg-box" class="sugg"></div>
+    <label class="lbl">Valor</label>
+    <input class="inp" id="mov-valor" type="number" placeholder="0.00" min="0" step="0.01" inputmode="decimal">
+    <label class="lbl">Data</label>
+    <input class="inp" id="mov-data" type="date">
+    <label class="lbl">Nota (opcional)</label>
+    <input class="inp" id="mov-nota" placeholder="Observação...">
+    <div id="mov-err" class="err"></div>
+    <button class="btn btn-p" onclick="salvarMov()" style="padding:14px">Guardar</button>
+    <button class="btn" style="margin-top:10px;padding:14px" onclick="voltarDeMov()">Cancelar</button>
+  </div>
+</div>
+
+<div id="pg-det" class="pg">
+  <div class="topbar">
+    <button class="btn btn-ic" id="det-back"><i class="ti ti-arrow-left"></i></button>
+    <h1>Detalhe</h1>
+  </div>
+  <div class="scroll" id="det-body"></div>
+</div>
+
+<!-- div oculto para captura de imagem -->
+<div id="rel-capture" style="position:fixed;top:0;left:0;width:390px;background:#fff;padding:20px;font-family:-apple-system,sans-serif;color:#1a1a2e;z-index:-1;opacity:0;pointer-events:none"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+let S={user:null,contas:[],movimentos:[],nomes:[],tipoMov:'neg',corConta:'#378ADD',relP:'dia',relTipo:'todos',relCustom:null};
+let contaAtual=null,movOrigemPg=null,movContaId=null;
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function fmt(v,m){return Number(v).toLocaleString('pt-MZ',{minimumFractionDigits:2,maximumFractionDigits:2})+(m?' '+m:'')}
+function save(){if(!S.user)return;localStorage.setItem('sg1_'+S.user.email,JSON.stringify({contas:S.contas,movimentos:S.movimentos,nomes:S.nomes}))}
+function load(){const d=JSON.parse(localStorage.getItem('sg1_'+S.user.email)||'{}');S.contas=d.contas||[];S.movimentos=d.movimentos||[];S.nomes=d.nomes||[]}
+function show(id){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0)}
+
+function doLogin(){
+  const em=document.getElementById('li-email').value.trim();
+  const pw=document.getElementById('li-pass').value;
+  const err=document.getElementById('li-err');
+  if(!em||!pw){err.textContent='Preenche todos os campos';err.style.display='block';return}
+  let users=JSON.parse(localStorage.getItem('sg1_users')||'[]');
+  let u=users.find(x=>x.email===em&&x.pass===pw);
+  if(!u){err.textContent='Email ou password incorrectos';err.style.display='block';return}
+  err.style.display='none';S.user=u;load();renderApp();show('pg-main');
+}
+
+function doReg(){
+  const n=document.getElementById('rg-nome').value.trim();
+  const e=document.getElementById('rg-email').value.trim();
+  const p=document.getElementById('rg-pass').value;
+  const p2=document.getElementById('rg-pass2').value;
+  const err=document.getElementById('rg-err');
+  if(!n||!e||!p){err.textContent='Preenche todos os campos';err.style.display='block';return}
+  if(p.length<6){err.textContent='Password mínimo 6 caracteres';err.style.display='block';return}
+  if(p!==p2){err.textContent='Passwords não coincidem';err.style.display='block';return}
+  let users=JSON.parse(localStorage.getItem('sg1_users')||'[]');
+  if(users.find(u=>u.email===e)){err.textContent='Email já registado';err.style.display='block';return}
+  users.push({email:e,pass:p,nome:n});
+  localStorage.setItem('sg1_users',JSON.stringify(users));
+  alert('Conta criada! Faz login agora.');show('pg-login');
+}
+
+function doLogout(){S.user=null;S.contas=[];S.movimentos=[];S.nomes=[];show('pg-login')}
+function renderApp(){renderInicio();renderContas()}
+
+function renderInicio(){
+  const rc=document.getElementById('resumo-contas');
+  rc.innerHTML=!S.contas.length
+    ?'<div class="empty"><i class="ti ti-wallet-off"></i>Sem contas ainda.<br>Vai ao separador Contas e cria a primeira.</div>'
+    :S.contas.map(c=>{
+      const ini=c.nome.slice(0,2).toUpperCase();const cor=c.cor||'#378ADD';
+      return `<div class="card" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer" onclick="abrirConta('${c.id}')">
+        <div class="ca" style="width:42px;height:42px;font-size:14px;background:${cor}22;color:${cor}">${ini}</div>
+        <div style="flex:1"><div style="font-size:15px;font-weight:600">${c.nome}</div><div style="font-size:12px;color:var(--txt2)">${c.moeda||'MZN'}</div></div>
+        <div style="font-size:16px;font-weight:600;color:${Number(c.saldo)>=0?'var(--green)':'var(--red)'}">${fmt(c.saldo,c.moeda||'MZN')}</div>
+        <i class="ti ti-chevron-right" style="font-size:18px;color:var(--txt3)"></i>
+      </div>`;
+    }).join('');
+  const ms=[...S.movimentos].sort((a,b)=>new Date(b.data)-new Date(a.data)).slice(0,8);
+  document.getElementById('lista-ult').innerHTML=ms.length?ms.map(m=>miHtml(m,'pg-main')).join(''):'<div class="empty"><i class="ti ti-receipt"></i>Sem movimentos ainda</div>';
+}
+
+function renderContas(){
+  const el=document.getElementById('lista-contas');
+  if(!S.contas.length){el.innerHTML='<div class="empty"><i class="ti ti-wallet-off"></i>Sem contas. Cria a primeira.</div>';return}
+  el.innerHTML=S.contas.map(c=>{
+    const ini=c.nome.slice(0,2).toUpperCase();const cor=c.cor||'#378ADD';
+    const nm=S.movimentos.filter(m=>m.conta===c.id).length;
+    return `<div class="ci" onclick="abrirConta('${c.id}')">
+      <div class="ca" style="width:44px;height:44px;font-size:14px;background:${cor}22;color:${cor}">${ini}</div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:600">${c.nome}</div><div style="font-size:12px;color:var(--txt2)">${nm} mov. · ${c.moeda||'MZN'}</div></div>
+      <div style="font-size:15px;font-weight:600;color:${Number(c.saldo)>=0?'var(--green)':'var(--red)'}">${fmt(c.saldo,c.moeda||'MZN')}</div>
+      <i class="ti ti-chevron-right" style="font-size:18px;color:var(--txt3)"></i>
+    </div>`;
+  }).join('');
+}
+
+function abrirConta(id){
+  contaAtual=id;const c=S.contas.find(x=>x.id===id);if(!c)return;
+  document.getElementById('ct-titulo').textContent=c.nome;
+  document.getElementById('ct-filtro').value='todos';
+  document.getElementById('confirm-nome-conta').value='';
+  renderConta();show('pg-conta');
+}
+
+function voltarParaContas(){switchTab('contas');show('pg-main')}
+
+function renderConta(){
+  const c=S.contas.find(x=>x.id===contaAtual);if(!c)return;
+  const ini=c.nome.slice(0,2).toUpperCase();const cor=c.cor||'#378ADD';const moeda=c.moeda||'MZN';
+  document.getElementById('ct-header').innerHTML=`
+    <div class="ca" style="width:50px;height:50px;font-size:17px;background:${cor}22;color:${cor}">${ini}</div>
+    <div style="flex:1"><div style="font-size:17px;font-weight:600">${c.nome}</div><span class="moeda-tag">${moeda}</span></div>
+    <div style="text-align:right">
+      <div style="font-size:22px;font-weight:700;color:${Number(c.saldo)>=0?'var(--green)':'var(--red)'}">${fmt(c.saldo,moeda)}</div>
+      <div style="font-size:11px;color:var(--txt2)">Saldo actual</div>
+    </div>`;
+  const filtro=document.getElementById('ct-filtro').value;
+  let ms=S.movimentos.filter(m=>m.conta===contaAtual);
+  if(filtro==='pos')ms=ms.filter(m=>m.tipo==='pos');
+  if(filtro==='neg')ms=ms.filter(m=>m.tipo==='neg');
+  ms.sort((a,b)=>new Date(b.data)-new Date(a.data));
+  const ent=S.movimentos.filter(m=>m.conta===contaAtual&&m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
+  const sai=S.movimentos.filter(m=>m.conta===contaAtual&&m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
+  document.getElementById('ct-ent').textContent=fmt(ent,moeda);
+  document.getElementById('ct-sai').textContent=fmt(sai,moeda);
+  document.getElementById('ct-movs').innerHTML=ms.length?ms.map(m=>miHtml(m,'pg-conta')).join(''):'<div class="empty"><i class="ti ti-receipt"></i>Sem movimentos</div>';
+}
+
+function miHtml(m,origem){
+  const c=S.contas.find(x=>x.id===m.conta)||{nome:'—',cor:'#888',moeda:'MZN'};
+  const pos=m.tipo==='pos';const moeda=c.moeda||'MZN';
+  return `<div class="mi" onclick="verMov('${m.id}','${origem}')">
+    <div class="mi-ic" style="background:${pos?'var(--green-bg)':'var(--red-bg)'}">
+      <i class="ti ti-${pos?'arrow-down-left':'arrow-up-right'}" style="color:${pos?'var(--green)':'var(--red)'}"></i>
+    </div>
+    <div class="mi-inf"><div class="mi-n">${m.nome}</div><div class="mi-d">${m.data} · ${c.nome}</div></div>
+    <div class="mi-v ${pos?'pos':'neg'}">${pos?'+':'-'}${fmt(m.valor,moeda)}</div>
+  </div>`;
+}
+
+function switchTab(t){
+  ['inicio','contas','rel'].forEach(x=>{
+    document.getElementById('tab-'+x).style.display=x===t?'block':'none';
+    document.getElementById('tb-'+x).className='tab'+(x===t?' on':'');
+  });
+  const titles={inicio:'Início',contas:'Contas',rel:'Relatórios'};
+  document.getElementById('main-titulo').textContent=titles[t];
+  if(t==='rel'){
+    const desde=getDesde();const ate=getAte();
+    const fmt2=d=>d.toISOString().slice(0,10);
+    document.getElementById('rel-de').value=fmt2(desde);
+    document.getElementById('rel-ate').value=fmt2(ate);
+    renderRelatorio();
+  }
+  if(t==='contas')renderContas();
+  if(t==='inicio')renderInicio();
+}
+
+function abrirSelConta(){
+  const el=document.getElementById('sel-lista-contas');
+  el.innerHTML=!S.contas.length
+    ?'<div class="empty"><i class="ti ti-wallet-off"></i>Sem contas. Cria uma conta primeiro.</div>'
+    :S.contas.map(c=>{
+      const ini=c.nome.slice(0,2).toUpperCase();const cor=c.cor||'#378ADD';
+      return `<div class="ci" onclick="abrirMov('${c.id}')">
+        <div class="ca" style="width:42px;height:42px;font-size:13px;background:${cor}22;color:${cor}">${ini}</div>
+        <div style="flex:1"><div style="font-size:15px;font-weight:600">${c.nome}</div><div style="font-size:12px;color:var(--txt2)">${c.moeda||'MZN'} · ${fmt(c.saldo,c.moeda||'MZN')}</div></div>
+        <i class="ti ti-chevron-right" style="font-size:18px;color:var(--txt3)"></i>
+      </div>`;
+    }).join('');
+  show('pg-sel-conta');
+}
+
+function abrirMov(contaId){
+  if(!contaId)return;
+  const c=S.contas.find(x=>x.id===contaId);if(!c)return;
+  movContaId=contaId;
+  movOrigemPg=document.getElementById('pg-conta').classList.contains('on')?'pg-conta':'pg-main';
+  S.tipoMov='neg';
+  document.getElementById('tipo-pos').className='tbtn';
+  document.getElementById('tipo-neg').className='tbtn sn';
+  document.getElementById('mov-nome').value='';
+  document.getElementById('mov-valor').value='';
+  document.getElementById('mov-nota').value='';
+  document.getElementById('mov-data').value=new Date().toISOString().slice(0,10);
+  document.getElementById('mov-err').style.display='none';
+  hideSugg();
+  const cor=c.cor||'#378ADD';const ini=c.nome.slice(0,2).toUpperCase();
+  document.getElementById('mov-ca').style.background=cor+'22';
+  document.getElementById('mov-ca').style.color=cor;
+  document.getElementById('mov-ca').textContent=ini;
+  document.getElementById('mov-cn').textContent=c.nome;
+  document.getElementById('mov-cm').textContent=c.moeda||'MZN';
+  document.getElementById('mov-back').onclick=()=>voltarDeMov();
+  show('pg-mov');
+}
+
+function voltarDeMov(){
+  if(movOrigemPg==='pg-conta'){renderConta();show('pg-conta')}
+  else{renderApp();show('pg-main')}
+}
+
+function setTipo(t){
+  S.tipoMov=t;
+  document.getElementById('tipo-pos').className='tbtn'+(t==='pos'?' sp':'');
+  document.getElementById('tipo-neg').className='tbtn'+(t==='neg'?' sn':'');
+}
+
+function onNomeInput(){
+  const v=document.getElementById('mov-nome').value.trim().toLowerCase();
+  const box=document.getElementById('sugg-box');
+  if(!v){box.style.display='none';return}
+  const m=S.nomes.filter(n=>n.toLowerCase().includes(v)&&n.toLowerCase()!==v).slice(0,5);
+  if(!m.length){box.style.display='none';return}
+  box.innerHTML=m.map(n=>`<div class="sugg-item" onmousedown="selSugg('${n.replace(/'/g,"\\'")}')"><i class="ti ti-user" style="font-size:15px;color:var(--txt3)"></i>${n}</div>`).join('');
+  box.style.display='block';
+}
+function selSugg(n){document.getElementById('mov-nome').value=n;hideSugg()}
+function hideSugg(){document.getElementById('sugg-box').style.display='none'}
+
+function salvarMov(){
+  const nome=document.getElementById('mov-nome').value.trim();
+  const valor=parseFloat(document.getElementById('mov-valor').value);
+  const data=document.getElementById('mov-data').value;
+  const nota=document.getElementById('mov-nota').value.trim();
+  const err=document.getElementById('mov-err');
+  if(!nome){err.textContent='Nome é obrigatório';err.style.display='block';return}
+  if(!valor||valor<=0){err.textContent='Valor inválido';err.style.display='block';return}
+  if(!movContaId){err.textContent='Conta não definida';err.style.display='block';return}
+  err.style.display='none';
+  const mov={id:uid(),nome,valor,tipo:S.tipoMov,conta:movContaId,data,nota};
+  S.movimentos.push(mov);
+  const c=S.contas.find(x=>x.id===movContaId);
+  if(c)c.saldo=Number(c.saldo)+(S.tipoMov==='pos'?valor:-valor);
+  if(!S.nomes.includes(nome)){S.nomes.push(nome);if(S.nomes.length>300)S.nomes.shift()}
+  save();voltarDeMov();
+}
+
+function confirmarApagarConta(){
+  const c=S.contas.find(x=>x.id===contaAtual);
+  if(!c) return;
+  const input=document.getElementById('confirm-nome-conta').value.trim();
+  if(input!==c.nome){
+    alert('O nome não coincide. Escreve exactamente: '+c.nome);
+    return;
+  }
+  S.movimentos=S.movimentos.filter(m=>m.conta!==contaAtual);
+  S.contas=S.contas.filter(x=>x.id!==contaAtual);
+  save();renderContas();renderInicio();voltarParaContas();
+}
+
+function selCor(el){
+  document.querySelectorAll('.cor').forEach(e=>e.style.border='3px solid transparent');
+  el.style.border='3px solid var(--txt)';S.corConta=el.dataset.c;
+}
+
+function salvarConta(){
+  const nome=document.getElementById('nc-nome').value.trim();
+  const saldo=parseFloat(document.getElementById('nc-saldo').value)||0;
+  const moeda=document.getElementById('nc-moeda').value;
+  const err=document.getElementById('nc-err');
+  if(!nome){err.textContent='Nome é obrigatório';err.style.display='block';return}
+  err.style.display='none';
+  const nova={id:uid(),nome,saldo,moeda,cor:S.corConta||'#378ADD'};
+  S.contas.push(nova);save();
+  contaAtual=nova.id;
+  document.getElementById('ct-titulo').textContent=nova.nome;
+  document.getElementById('ct-filtro').value='todos';
+  document.getElementById('confirm-nome-conta').value='';
+  renderConta();show('pg-conta');
+}
+
+function getDesde(){
+  const h=new Date();h.setHours(0,0,0,0);
+  if(S.relP==='custom'&&S.relCustom) return new Date(S.relCustom.de+'T00:00:00');
+  if(S.relP==='dia') return h;
+
+  if(S.relP==='semana'){const d=new Date(h);d.setDate(d.getDate()-6);return d}
+  if(S.relP==='mes')return new Date(h.getFullYear(),h.getMonth(),1);
+  return new Date(h.getFullYear(),0,1);
+}
+function getAte(){
+  const h=new Date();h.setHours(23,59,59,999);
+  if(S.relP==='custom'&&S.relCustom){const d=new Date(S.relCustom.ate+'T23:59:59');return d}
+
+  return h;
+}
+function setRel(p){
+  S.relP=p;
+  S.relCustom=null;
+  const btns=[{i:'rb-dia',v:'dia'},{i:'rb-sem',v:'semana'},{i:'rb-mes',v:'mes'},{i:'rb-ano',v:'ano'}];
+  btns.forEach(x=>{ const el=document.getElementById(x.i); if(el) el.className='tbtn'+(x.v===p?' sp':''); });
+  const desde=getDesde();
+  const ate=getAte();
+  const fmt2=d=>d.toISOString().slice(0,10);
+  document.getElementById('rel-de').value=fmt2(desde);
+  document.getElementById('rel-ate').value=fmt2(ate);
+  renderRelatorio();
+}
+function setRelPersonalizado(){
+  const de=document.getElementById('rel-de').value;
+  const ate=document.getElementById('rel-ate').value;
+  if(!de||!ate) return;
+  S.relP='custom';
+  S.relCustom={de,ate};
+  const btns=[{i:'rb-dia'},{i:'rb-sem'},{i:'rb-mes'},{i:'rb-ano'}];
+  btns.forEach(x=>{ const el=document.getElementById(x.i); if(el) el.className='tbtn'; });
+  renderRelatorio();
+}
+function setRelTipo(t){
+  S.relTipo=t;
+  document.getElementById('rt-tod').className='tbtn'+(t==='todos'?' sa':'');
+  document.getElementById('rt-pos').className='tbtn'+(t==='pos'?' sp':'');
+  document.getElementById('rt-neg').className='tbtn'+(t==='neg'?' sn':'');
+  renderRelatorio();
+}
+
+function calcSaldoInicial(contaId,desde){
+  const c=S.contas.find(x=>x.id===contaId);if(!c)return 0;
+  const movsAnteriores=S.movimentos.filter(m=>m.conta===contaId&&new Date(m.data)<desde);
+  const entAnt=movsAnteriores.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
+  const saiAnt=movsAnteriores.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
+  return Number(c.saldo)-(entAnt-saiAnt)+(entAnt-saiAnt);
+  // saldo actual - movimentos depois do período = saldo no início do período
+  // saldo actual = saldo_inicial + todos_movimentos
+  // saldo_inicial = saldo_actual - todos_movimentos
+  // saldo_inicio_periodo = saldo_inicial + movimentos_anteriores_ao_periodo
+}
+
+function calcSaldoInicialPeriodo(contaId,desde,ate){
+  const c=S.contas.find(x=>x.id===contaId);if(!c)return 0;
+  const movsPeriodo=S.movimentos.filter(m=>{if(m.conta!==contaId)return false;const d=new Date(m.data+'T00:00:00');return d>=desde&&d<=(ate||new Date());});
+  const entP=movsPeriodo.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
+  const saiP=movsPeriodo.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
+  return Number(c.saldo)-(entP-saiP);
+}
+
+function renderRelatorio(){
+  const desde=getDesde();
+  const ate=getAte();
+  let ms=S.movimentos.filter(m=>{const d=new Date(m.data+'T00:00:00');return d>=desde&&d<=ate});
+  const rpc=document.getElementById('rel-por-conta');
+  rpc.innerHTML=S.contas.map(c=>{
+    const moeda=c.moeda||'MZN';const cor=c.cor||'#378ADD';
+    const ini=c.nome.slice(0,2).toUpperCase();
+    const cMs=ms.filter(m=>m.conta===c.id);
+    const ent=cMs.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
+    const sai=cMs.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
+    const max=Math.max(ent,sai,1);
+    const saldoIni=calcSaldoInicialPeriodo(c.id,desde,ate);
+    const saldoFim=Number(c.saldo);
+    return `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div class="ca" style="width:30px;height:30px;font-size:11px;background:${cor}22;color:${cor}">${ini}</div>
+        <span style="font-size:14px;font-weight:600">${c.nome}</span>
+        <span class="moeda-tag">${moeda}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--bg);border-radius:var(--rad);padding:8px 10px">
+          <div style="font-size:10px;color:var(--txt2);margin-bottom:2px">Saldo inicial</div>
+          <div style="font-size:14px;font-weight:600;color:${saldoIni>=0?'var(--green)':'var(--red)'}">${fmt(saldoIni,moeda)}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:var(--rad);padding:8px 10px">
+          <div style="font-size:10px;color:var(--txt2);margin-bottom:2px">Saldo final</div>
+          <div style="font-size:14px;font-weight:600;color:${saldoFim>=0?'var(--green)':'var(--red)'}">${fmt(saldoFim,moeda)}</div>
+        </div>
+      </div>
+      <div class="bw"><div class="bl"><span class="pos">Entradas</span><span>${fmt(ent,moeda)}</span></div><div class="bt"><div class="bf" style="background:#1D9E75;width:${Math.round(ent/max*100)}%"></div></div></div>
+      <div class="bw"><div class="bl"><span class="neg">Saídas</span><span>${fmt(sai,moeda)}</span></div><div class="bt"><div class="bf" style="background:#E24B4A;width:${Math.round(sai/max*100)}%"></div></div></div>
+      <div style="border-top:1px solid var(--brd);padding-top:8px;margin-top:6px;display:flex;justify-content:space-between;font-size:13px">
+        <span style="color:var(--txt2)">Resultado</span>
+        <span style="font-weight:600;color:${ent-sai>=0?'var(--green)':'var(--red)'}">${ent-sai>=0?'+':''}${fmt(ent-sai,moeda)}</span>
+      </div>
+    </div>`;
+  }).join('');
+  let msF=[...ms];
+  if(S.relTipo!=='todos')msF=msF.filter(m=>m.tipo===S.relTipo);
+  msF.sort((a,b)=>new Date(b.data)-new Date(a.data));
+  document.getElementById('lista-rel').innerHTML=msF.length?msF.map(m=>miHtml(m,'pg-main')).join(''):'<div class="empty"><i class="ti ti-chart-bar"></i>Sem movimentos no período</div>';
+}
+
+function verMov(id,origem){
+  const m=S.movimentos.find(x=>x.id===id);if(!m)return;
+  const c=S.contas.find(x=>x.id===m.conta)||{nome:'—',moeda:'MZN'};
+  const pos=m.tipo==='pos';const moeda=c.moeda||'MZN';
+  document.getElementById('det-body').innerHTML=`
+    <div style="text-align:center;padding:28px 16px 20px">
+      <div style="width:56px;height:56px;border-radius:50%;background:${pos?'var(--green-bg)':'var(--red-bg)'};display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <i class="ti ti-${pos?'arrow-down-left':'arrow-up-right'}" style="font-size:24px;color:${pos?'var(--green)':'var(--red)'}"></i>
+      </div>
+      <div style="font-size:32px;font-weight:700;color:${pos?'var(--green)':'var(--red)'}">${pos?'+':'-'}${fmt(m.valor,moeda)}</div>
+      <div style="font-size:15px;color:var(--txt2);margin-top:8px">${m.nome}</div>
+    </div>
+    <div class="card">
+      <table style="width:100%;font-size:14px;border-collapse:collapse">
+        <tr><td style="color:var(--txt2);padding:10px 0;border-bottom:1px solid var(--brd)">Tipo</td>
+            <td style="text-align:right;padding:10px 0;border-bottom:1px solid var(--brd)">
+              <span style="font-size:12px;padding:3px 10px;border-radius:20px;background:${pos?'var(--green-bg)':'var(--red-bg)'};color:${pos?'var(--green)':'var(--red)'};font-weight:600">${pos?'Entrada':'Saída'}</span>
+            </td></tr>
+        <tr><td style="color:var(--txt2);padding:10px 0;border-bottom:1px solid var(--brd)">Conta</td>
+            <td style="text-align:right;padding:10px 0;border-bottom:1px solid var(--brd)">${c.nome} <span class="moeda-tag">${moeda}</span></td></tr>
+        <tr><td style="color:var(--txt2);padding:10px 0${m.nota?';border-bottom:1px solid var(--brd)':''}">Data</td>
+            <td style="text-align:right;padding:10px 0${m.nota?';border-bottom:1px solid var(--brd)':''}">${m.data}</td></tr>
+        ${m.nota?`<tr><td style="color:var(--txt2);padding:10px 0">Nota</td><td style="text-align:right;padding:10px 0">${m.nota}</td></tr>`:''}
+      </table>
+    </div>
+    <button class="btn btn-d" style="padding:14px" onclick="apagarMov('${m.id}','${origem}')"><i class="ti ti-trash"></i> Apagar movimento</button>`;
+  document.getElementById('det-back').onclick=()=>{
+    if(origem==='pg-conta'){renderConta();show('pg-conta')}
+    else{renderApp();show('pg-main')}
+  };
+  show('pg-det');
+}
+
+function apagarMov(id,origem){
+  if(!confirm('Apagar este movimento?'))return;
+  const m=S.movimentos.find(x=>x.id===id);if(!m)return;
+  const c=S.contas.find(x=>x.id===m.conta);
+  if(c)c.saldo=Number(c.saldo)-(m.tipo==='pos'?Number(m.valor):-Number(m.valor));
+  S.movimentos=S.movimentos.filter(x=>x.id!==id);
+  save();
+  if(origem==='pg-conta'){renderConta();show('pg-conta')}
+  else{renderApp();show('pg-main')}
+}
+
+function periodoLabel(){
+  if(S.relP==='custom'&&S.relCustom) return S.relCustom.de+' a '+S.relCustom.ate;
+  return {dia:'Hoje',semana:'Última Semana',mes:'Este Mês',ano:'Este Ano'}[S.relP]||S.relP;
+}
+function tipoLabel(){return {todos:'Todos os movimentos',pos:'Apenas Entradas',neg:'Apenas Saídas'}[S.relTipo]}
+
+function gerarRelatorioHTML(){
+  const desde=getDesde();
+  const ate=getAte();
+  const ms=S.movimentos.filter(m=>{const d=new Date(m.data+'T00:00:00');return d>=desde&&d<=ate;});
+  let msF=[...ms];
+  if(S.relTipo!=='todos') msF=msF.filter(m=>m.tipo===S.relTipo);
+  msF.sort((a,b)=>new Date(b.data)-new Date(a.data));
+
+  let html=`<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SamGestor — ${periodoLabel()}</title>
+  <style>
+    body{font-family:-apple-system,sans-serif;margin:0;padding:16px;color:#1a1a2e;font-size:13px}
+    h2{font-size:15px;font-weight:700;margin:0 0 2px}
+    .sub{color:#888;font-size:11px;margin-bottom:16px}
+    .conta-card{border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-bottom:12px}
+    .conta-nome{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+    .box{background:#f5f5f5;border-radius:6px;padding:7px 9px}
+    .box-l{font-size:10px;color:#888;margin-bottom:1px}
+    .box-v{font-size:13px;font-weight:700}
+    .pos{color:#085041}.neg{color:#791F1F}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th{background:#f5f5f5;padding:6px 8px;text-align:left;font-size:11px;border-bottom:2px solid #e0e0e0}
+    td{padding:6px 8px;border-bottom:1px solid #f0f0f0;font-size:12px}
+    .val-pos{text-align:right;color:#085041;font-weight:600}
+    .val-neg{text-align:right;color:#791F1F;font-weight:600}
+    .saldo-final{margin-top:10px;padding:8px 10px;background:#f0fdf4;border-radius:6px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;border:1px solid #bbf7d0}
+    @media print{body{padding:0}.btn-print{display:none}}
+  </style></head><body>
+  <h2>SamGestor</h2>
+  <div class="sub">${periodoLabel()} · ${tipoLabel()} · ${new Date().toLocaleDateString('pt-MZ')}</div>`;
+
+  S.contas.forEach(c=>{
+    const moeda=c.moeda||'MZN';
+    const cMs=ms.filter(m=>m.conta===c.id);
+    const ent=cMs.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
+    const sai=cMs.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
+    const saldoIni=calcSaldoInicialPeriodo(c.id,desde,ate);
+    const saldoFim=Number(c.saldo);
+    const res=ent-sai;
+    // movimentos desta conta no período filtrado
+    let cMsF=cMs;
+    if(S.relTipo!=='todos') cMsF=cMsF.filter(m=>m.tipo===S.relTipo);
+    cMsF.sort((a,b)=>new Date(b.data)-new Date(a.data));
+
+    html+=`<div class="conta-card">
+      <div class="conta-nome">${c.nome} <span style="font-size:11px;font-weight:normal;color:#888">${moeda}</span></div>
+      <div class="grid">
+        <div class="box"><div class="box-l">Saldo inicial</div><div class="box-v ${saldoIni>=0?'pos':'neg'}">${fmt(saldoIni,moeda)}</div></div>
+        <div class="box"><div class="box-l">Entradas</div><div class="box-v pos">${fmt(ent,moeda)}</div></div>
+        <div class="box"><div class="box-l">Saídas</div><div class="box-v neg">${fmt(sai,moeda)}</div></div>
+        <div class="box"><div class="box-l">Resultado</div><div class="box-v ${res>=0?'pos':'neg'}">${res>=0?'+':''}${fmt(res,moeda)}</div></div>
+      </div>`;
+
+    if(cMsF.length){
+      html+=`<table><thead><tr><th>Data</th><th>Descrição</th><th style="text-align:right">Valor</th></tr></thead><tbody>`;
+      cMsF.forEach(m=>{
+        const pos=m.tipo==='pos';
+        html+=`<tr><td>${m.data}</td><td>${m.nome}${m.nota?'<br><span style="font-size:10px;color:#aaa">'+m.nota+'</span>':''}</td><td class="${pos?'val-pos':'val-neg'}">${pos?'+':'-'}${fmt(m.valor,moeda)}</td></tr>`;
+      });
+      html+=`</tbody></table>`;
+    }
+
+    html+=`<div class="grid" style="margin-top:8px">
+        <div class="box"><div class="box-l">Total entradas</div><div class="box-v pos">${fmt(ent,moeda)}</div></div>
+        <div class="box"><div class="box-l">Total saídas</div><div class="box-v neg">${fmt(sai,moeda)}</div></div>
+      </div>
+      <div class="saldo-final"><span>Saldo final</span><span class="${saldoFim>=0?'pos':'neg'}">${fmt(saldoFim,moeda)}</span></div>
+    </div>`;
+  });
+
+  html+=`<div style="margin-top:16px;text-align:center" class="btn-print">
+    <button onclick="window.print()" style="background:#1a56db;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;cursor:pointer">
+      Imprimir / Guardar como PDF
+    </button>
+  </div></body></html>`;
+
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+  else{alert('Activa os pop-ups para este site e tenta novamente.');}
+}
+
+function expPDF(){
+  if(!window.jspdf){gerarRelatorioHTML();return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const desde=getDesde();
+  const ate=getAte();
+  const ms=S.movimentos.filter(m=>{const d=new Date(m.data+'T00:00:00');return d>=desde&&d<=ate;});
+  if(S.relTipo!=='todos') ms.filter(m=>m.tipo===S.relTipo);
+
+  // Cabeçalho limpo
+  doc.setFontSize(16);doc.setFont(undefined,'bold');doc.setTextColor(26,86,219);
+  doc.text('SamGestor',20,18);
+  doc.setFontSize(9);doc.setFont(undefined,'normal');doc.setTextColor(120);
+  doc.text(periodoLabel()+' · '+tipoLabel()+' · '+new Date().toLocaleDateString('pt-MZ'),20,25);
+  doc.setDrawColor(200);doc.line(20,28,190,28);
+
+  let y=36;
+
+  S.contas.forEach(c=>{
+    const moeda=c.moeda||'MZN';
+    let cMs=ms.filter(m=>m.conta===c.id);
+    if(S.relTipo!=='todos') cMs=cMs.filter(m=>m.tipo===S.relTipo);
+    cMs.sort((a,b)=>new Date(b.data)-new Date(a.data));
+    const ent=cMs.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
+    const sai=cMs.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
+    const saldoIni=calcSaldoInicialPeriodo(c.id,desde,ate);
+    const saldoFim=Number(c.saldo);
+    const res=ent-sai;
+
+    if(y>250){doc.addPage();y=20}
+
+    // Nome da conta
+    doc.setFontSize(12);doc.setFont(undefined,'bold');doc.setTextColor(0);
+    doc.text(c.nome+' ('+moeda+')',20,y);y+=7;
+
+    // Saldo inicial no cabeçalho
+    doc.setFontSize(9);doc.setFont(undefined,'normal');
+    doc.setTextColor(80);doc.text('Saldo inicial: '+fmt(saldoIni,moeda),20,y);y+=6;
+
+    // Movimentos desta conta
+    if(cMs.length){
+      doc.setFontSize(8);doc.setFont(undefined,'bold');doc.setTextColor(100);
+      doc.text('DATA',20,y);doc.text('DESCRIÇÃO',42,y);doc.text('VALOR',170,y,'right');
+      doc.setDrawColor(200);doc.line(20,y+1,190,y+1);y+=5;
+      doc.setFont(undefined,'normal');
+      cMs.forEach(m=>{
+        if(y>275){doc.addPage();y=20}
+        doc.setTextColor(100);doc.text(m.data,20,y);
+        doc.setTextColor(0);doc.text(m.nome.slice(0,40),42,y);
+        m.tipo==='pos'?doc.setTextColor(8,80,65):doc.setTextColor(121,31,31);
+        doc.text((m.tipo==='pos'?'+':'-')+fmt(m.valor,moeda),170,y,'right');
+        doc.setTextColor(0);y+=5;
+      });
+    }
+
+    // Saldo final em destaque
+    doc.setDrawColor(200);doc.line(20,y+1,190,y+1);y+=4;
+    doc.setFontSize(10);doc.setFont(undefined,'bold');
+    doc.setTextColor(saldoFim>=0?8:121,saldoFim>=0?80:31,saldoFim>=0?65:31);
+    doc.text('Saldo final: '+fmt(saldoFim,moeda),170,y,'right');y+=6;
+    doc.setFontSize(9);doc.setFont(undefined,'normal');
+    doc.setTextColor(8,80,65);doc.text('Total entradas: '+fmt(ent,moeda),20,y);
+    doc.setTextColor(121,31,31);doc.text('Total saídas: '+fmt(sai,moeda),100,y);
+    y+=12;
+  });
+
+  const nomesContas=S.contas.map(c=>c.nome.replace(/\s+/g,'_')).join('-');
+  const dataFich=new Date().toISOString().slice(0,10);
+  const periodoFich=S.relP==='custom'&&S.relCustom?S.relCustom.de+'_a_'+S.relCustom.ate:S.relP;
+  doc.save(nomesContas+'_'+periodoFich+'_'+dataFich+'.pdf');
+}
+
+function expImagem(){
+  if(typeof html2canvas==='undefined'){gerarRelatorioHTML();return;}
+  const desde=getDesde();
+  const ate=getAte();
+  const ms=S.movimentos.filter(m=>{const d=new Date(m.data+'T00:00:00');return d>=desde&&d<=ate;});
+  const cap=document.getElementById('rel-capture');
+
+  let html=`<div style="font-family:-apple-system,sans-serif;background:#fff;padding:16px;color:#1a1a2e;width:370px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #1a56db">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#1a56db">SamGestor</div>
+        <div style="font-size:10px;color:#888;margin-top:1px">${periodoLabel()} · ${new Date().toLocaleDateString('pt-MZ')}</div>
+      </div>
+    </div>`;
+
+  S.contas.forEach(c=>{
+    const moeda=c.moeda||'MZN';const cor=c.cor||'#378ADD';
+    let cMs=ms.filter(m=>m.conta===c.id);
+    if(S.relTipo!=='todos') cMs=cMs.filter(m=>m.tipo===S.relTipo);
+    cMs.sort((a,b)=>new Date(b.data)-new Date(a.data));
+    const ent=cMs.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
+    const sai=cMs.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
+    const saldoIni=calcSaldoInicialPeriodo(c.id,desde,ate);
+    const saldoFim=Number(c.saldo);
+    const res=ent-sai;
+    const ini=c.nome.slice(0,2).toUpperCase();
+
+    html+=`<div style="border:1px solid #e0e0e0;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid ${cor}">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+        <div style="width:26px;height:26px;border-radius:50%;background:${cor}22;color:${cor};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">${ini}</div>
+        <span style="font-size:13px;font-weight:700">${c.nome}</span>
+        <span style="font-size:10px;padding:1px 6px;background:#f0f0f0;border-radius:8px;color:#555">${moeda}</span>
+      </div>
+      <div style="background:#f8f9fa;border-radius:6px;padding:6px 8px;margin-bottom:9px;display:inline-block">
+          <div style="font-size:9px;color:#888;margin-bottom:1px">Saldo inicial</div>
+          <div style="font-size:12px;font-weight:700;color:${saldoIni>=0?'#085041':'#791F1F'}">${fmt(saldoIni,moeda)}</div>
+        </div>`;
+
+    // Movimentos
+    if(cMs.length){
+      html+=`<table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:11px">
+        <tr style="background:#f8f9fa"><th style="padding:5px 6px;text-align:left;font-weight:600;color:#888">Data</th><th style="padding:5px 6px;text-align:left;font-weight:600;color:#888">Descrição</th><th style="padding:5px 6px;text-align:right;font-weight:600;color:#888">Valor</th></tr>`;
+      cMs.forEach(m=>{
+        const pos=m.tipo==='pos';
+        html+=`<tr style="border-bottom:1px solid #f0f0f0">
+          <td style="padding:5px 6px;color:#888">${m.data}</td>
+          <td style="padding:5px 6px">${m.nome}</td>
+          <td style="padding:5px 6px;text-align:right;font-weight:600;color:${pos?'#085041':'#791F1F'}">${pos?'+':'-'}${fmt(m.valor,moeda)}</td>
+        </tr>`;
+      });
+      html+=`</table>`;
+    }
+
+    html+=`<div style="background:${saldoFim>=0?'#E1F5EE':'#FCEBEB'};border-radius:6px;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:11px;font-weight:600;color:${saldoFim>=0?'#085041':'#791F1F'}">Saldo final</span>
+        <span style="font-size:13px;font-weight:700;color:${saldoFim>=0?'#085041':'#791F1F'}">${fmt(saldoFim,moeda)}</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <div style="flex:1;background:#E1F5EE;border-radius:6px;padding:6px 8px">
+          <div style="font-size:9px;color:#085041;margin-bottom:1px">Total entradas</div>
+          <div style="font-size:11px;font-weight:700;color:#085041">${fmt(ent,moeda)}</div>
+        </div>
+        <div style="flex:1;background:#FCEBEB;border-radius:6px;padding:6px 8px">
+          <div style="font-size:9px;color:#791F1F;margin-bottom:1px">Total saídas</div>
+          <div style="font-size:11px;font-weight:700;color:#791F1F">${fmt(sai,moeda)}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html+='</div>';
+  cap.innerHTML=html;
+  cap.style.opacity='1';
+  cap.style.zIndex='9999';
+  html2canvas(cap,{backgroundColor:'#fff',scale:2,useCORS:true,allowTaint:true,logging:false}).then(canvas=>{
+    cap.style.opacity='0';
+    cap.style.zIndex='-1';
+    const a=document.createElement('a');
+    const nomesC=S.contas.map(c=>c.nome.replace(/\s+/g,'_')).join('-');
+    const dataF=new Date().toISOString().slice(0,10);
+    const perF=S.relP==='custom'&&S.relCustom?S.relCustom.de+'_a_'+S.relCustom.ate:S.relP;
+    a.download=nomesC+'_'+perF+'_'+dataF+'.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+  }).catch(e=>{cap.style.opacity='0';cap.style.zIndex='-1';alert('Erro ao gerar imagem: '+e.message)});
+}
+
+document.querySelector('.cor[data-c="#378ADD"]').style.border='3px solid var(--txt)';
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}</script>
+</body>
+</html>
