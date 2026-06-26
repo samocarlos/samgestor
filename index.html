@@ -834,7 +834,7 @@ function gerarRelatorioHTML(){
     // movimentos desta conta no período filtrado
     let cMsF=cMs;
     if(S.relTipo!=='todos') cMsF=cMsF.filter(m=>m.tipo===S.relTipo);
-    cMsF.sort((a,b)=>new Date(b.data)-new Date(a.data));
+    cMs.sort((a,b)=>new Date(a.data)-new Date(b.data));
 
     html+=`<div class="conta-card">
       <div class="conta-nome">${c.nome} <span style="font-size:11px;font-weight:normal;color:#888">${moeda}</span></div>
