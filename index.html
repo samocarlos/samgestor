@@ -796,7 +796,7 @@ function gerarRelatorioHTML(){
   const ms=S.movimentos.filter(m=>{const d=new Date(m.data+'T00:00:00');return d>=desde&&d<=ate;});
   let msF=[...ms];
   if(S.relTipo!=='todos') msF=msF.filter(m=>m.tipo===S.relTipo);
-  msF.sort((a,b)=>new Date(b.data)-new Date(a.data));
+  msF.sort((a,b)=>new Date(a.data)-new Date(b.data));
 
   let html=`<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -895,7 +895,7 @@ function expPDF(){
     const moeda=c.moeda||'MZN';
     let cMs=ms.filter(m=>m.conta===c.id);
     if(S.relTipo!=='todos') cMs=cMs.filter(m=>m.tipo===S.relTipo);
-    cMs.sort((a,b)=>new Date(b.data)-new Date(a.data));
+    cMs.sort((a,b)=>new Date(a.data)-new Date(b.data));
     const ent=cMs.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
     const sai=cMs.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
     const saldoIni=calcSaldoInicialPeriodo(c.id,desde,ate);
@@ -961,7 +961,7 @@ function expImagem(){
     const moeda=c.moeda||'MZN';const cor=c.cor||'#378ADD';
     let cMs=ms.filter(m=>m.conta===c.id);
     if(S.relTipo!=='todos') cMs=cMs.filter(m=>m.tipo===S.relTipo);
-    cMs.sort((a,b)=>new Date(b.data)-new Date(a.data));
+    cMs.sort((a,b)=>new Date(a.data)-new Date(b.data));
     const ent=cMs.filter(m=>m.tipo==='pos').reduce((s,m)=>s+Number(m.valor),0);
     const sai=cMs.filter(m=>m.tipo==='neg').reduce((s,m)=>s+Number(m.valor),0);
     const saldoIni=calcSaldoInicialPeriodo(c.id,desde,ate);
